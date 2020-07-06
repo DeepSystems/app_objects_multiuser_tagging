@@ -1,12 +1,34 @@
 <div>
-    <div style="float: left; margin: 1px; width: 120px; border: 3px solid transparent;"
-         :style="{ borderColor: data.user2selectedUpc['1'] === index ? '#20A0FF' : 'transparent' }" v-for="(item, index) in data.user2upc['1']">
-        <el-tooltip class="item" effect="dark" :content="item.upc" placement="top-start">
-            <img style="display: block; width: 100%; height: 100px; object-fit: contain; background: white;"
-                 :src="item.image_url"
-                 @click="data.user2selectedUpc['1'] = index"
-            />
-        </el-tooltip>
-        <!--<div v-if="item.label.length >= 15" style="text-align:center; word-wrap:break-word;">{{ item.label.substring(0,15)+".." }}</div>-->
+    <div v-if="context.userId in data.user2upc">
+        <div>
+            <el-button size="mini"
+                       icon="arrow-left"
+                       style="margin-left: 10px;"
+                       @click="command('prev_object')">
+                Prev Object
+            </el-button>
+            <el-button size="mini"
+                       style="margin-left: 10px;"
+                       @click="command('next_object')">
+                Next Object<i class="el-icon-arrow-right el-icon-right"></i>
+            </el-button>
+            <el-button size="mini" style="margin-left: 10px; margin-right: 10px;"type="primary">Assign</el-button>
+        </div>
+        <div style="margin: 10px;">
+            <div v-for="(item, index) in data.user2upc[context.userId]">
+                <div style="float: left; width: 100%; border: 3px solid transparent;"
+                 :style="{ borderColor: data.user2selectedUpc['1'] === index ? '#20A0FF' : 'transparent' }">
+                    <img style="display: block; width: 100%; object-fit: contain; background: white;"
+                         :src="item.image_url"
+                         @click="data.user2selectedUpc['1'] = index"
+                    />
+                </div>
+                <!--#@TODO: horizontal line not working-->
+                <hr class="mb15" style="margin: 10px; height: 1px; color: #e0e0e0; background-color: #e0e0e0; border: none;"/>
+            </div>
+        </div>
+    </div>
+    <div v-if="!(context.userId in data.user2upc)">
+        <div>User with id = {{context.userId}} is not allowed for this app</div>
     </div>
 </div>
