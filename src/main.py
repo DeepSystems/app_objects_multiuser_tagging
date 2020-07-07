@@ -20,10 +20,6 @@ metas = {}
 
 TAG_NAME = 'upc'
 
-#@my_app.callback(sly.app.STOP_COMMAND)
-#def stop(api: sly.Api, task_id, context, state):
-#    sys.exit(0)
-
 
 def get_annotation(api: sly.Api, project_id, image_id):
     global anns
@@ -105,19 +101,19 @@ def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
 
 @my_app.callback("prev_object")
 @sly.timeit
-def prev_object(api: sly.Api, task_id, context, state):
+def prev_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_prev_id)
 
 
 @my_app.callback("next_object")
 @sly.timeit
-def next_object(api: sly.Api, task_id, context, state):
+def next_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_next_id, show_msg=True)
 
 
 @my_app.callback("assign_tag")
 @sly.timeit
-def assign_tag(api: sly.Api, task_id, context, state):
+def assign_tag(api: sly.Api, task_id, context, state, app_logger):
     global user2upc
 
     project_id = context["projectId"]
