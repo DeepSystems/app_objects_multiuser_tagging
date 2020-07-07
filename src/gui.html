@@ -1,6 +1,6 @@
 <div>
     <div v-if="context.userId in data.user2upc">
-        <div>
+        <div style="position: fixed; background: white; width: 100%; padding: 8px 0;">
             <el-button size="small"
                        icon="arrow-left"
                        style="margin-left: 10px;"
@@ -21,7 +21,9 @@
             </el-button>
         </div>
 
-        <hr class="mb15" style="height: 1px; color: #e0e0e0; background-color: #e0e0e0; border: none;"/>
+        <br/>
+        <br/>
+        <hr style="height: 1px; color: #e0e0e0; background-color: #e0e0e0; border: none;"/>
 
         <div style="margin: 10px;">
             <div v-for="(item, index) in data.user2upc[context.userId]">
