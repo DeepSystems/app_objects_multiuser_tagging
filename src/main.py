@@ -136,7 +136,6 @@ def assign_tag(api: sly.Api, task_id, context, state):
     api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
 
 
-
 def main():
     # data
     api = sly.Api.from_env()
