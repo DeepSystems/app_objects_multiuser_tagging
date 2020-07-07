@@ -12,13 +12,13 @@ user2upc = {}
 user2upc_remote_path = "/user2upc_demo.json"
 user2upc_local_path = os.path.join(my_app.app_dir, "user2upc_demo.json")
 
-user2selectedUpc = {}
-
 anns_lock = threading.Lock()
 anns = {}
 
 metas_lock = threading.Lock()
 metas = {}
+
+TAG_NAME = 'upc'
 
 #@my_app.callback(sly.app.STOP_COMMAND)
 #def stop(api: sly.Api, task_id, context, state):
@@ -45,6 +45,15 @@ def get_project_meta(api: sly.Api, project_id):
     if project_id not in metas:
         meta_json = api.project.get_meta(project_id)
         meta = sly.ProjectMeta.from_json(meta_json)
+
+        upc_tag_meta = meta.get_tag_meta(TAG_NAME)
+        if upc_tag_meta is None:
+            meta = meta.add_tag_meta(sly.TagMeta(TAG_NAME, sly.TagValueType.ANY_STRING))
+            api.project.update_meta(project_id, meta.to_json())
+
+            # get meta from server again to access tag_id (tag_meta_id)
+            meta_json = api.project.get_meta(project_id)
+            meta = sly.ProjectMeta.from_json(meta_json)
 
         global metas_lock
         metas_lock.acquire()
@@ -74,7 +83,7 @@ def get_next_id(ann: sly.Annotation, active_figure_id):
             return ann.labels[idx + 1].geometry.sly_id
 
 
-def select_object(api: sly.Api, context, find_func):
+def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
     user_id = context["userId"]
     image_id = context["imageId"]
     project_id = context["projectId"]
@@ -87,6 +96,8 @@ def select_object(api: sly.Api, context, find_func):
         active_figure_id = get_first_id(ann)
     else:
         active_figure_id = find_func(ann, active_figure_id)
+        if show_msg is True and active_figure_id is None:
+            api.app.set_field(task_id, "state.dialogVisible", True)
 
     if active_figure_id is not None:
         api.img_ann_tool.set_figure(ann_tool_session, active_figure_id)
@@ -95,13 +106,40 @@ def select_object(api: sly.Api, context, find_func):
 @my_app.callback("prev_object")
 @sly.timeit
 def prev_object(api: sly.Api, task_id, context, state):
-    select_object(api, context, get_prev_id)
+    select_object(api, task_id, context, get_prev_id)
 
 
 @my_app.callback("next_object")
 @sly.timeit
-def prev_object(api: sly.Api, task_id, context, state):
-    select_object(api, context, get_next_id)
+def next_object(api: sly.Api, task_id, context, state):
+    select_object(api, task_id, context, get_next_id, show_msg=True)
+
+
+@my_app.callback("assign_tag")
+@sly.timeit
+def assign_tag(api: sly.Api, task_id, context, state):
+    api.app.set_field(task_id, "state.dialogVisible", True)
+
+    # global user2upc
+    #
+    # project_id = context["projectId"]
+    # meta = get_project_meta(api, project_id)
+    #
+    # user_id = context["userId"]
+    # user2selectedUpc = api.app.get_field(task_id, 'data.user2selectedUpc')
+    # selected_tag_index = user2selectedUpc[str(user_id)]
+    # selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
+    #
+    #
+    #
+    # active_figure_id = context["figureId"]
+    # if active_figure_id is None:
+    #     sly.logger.warn("Figure is not selected.")
+    #
+    # tag_meta = meta.get_tag_meta(TAG_NAME)
+    #
+    # api.advanced.add_tag_to_object()
+
 
 
 def main():
@@ -117,18 +155,18 @@ def main():
     global user2upc
     user2upc = sly.io.json.load_json_file(user2upc_local_path)
 
-    global user2selectedUpc
+    user2selectedUpc = {}
     for key, value in user2upc.items():
         user2selectedUpc[key] = 0
 
     data = {
         "user2upc": user2upc,
-        "user2selectedUpc": user2selectedUpc,
-        "selectedObjectId": -1,
+        "user2selectedUpc": user2selectedUpc
     }
 
     # state
     state = {
+        "dialogVisible": False
     }
 
     # # start event after successful service run
