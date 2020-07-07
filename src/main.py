@@ -97,6 +97,7 @@ def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
 
     if active_figure_id is not None:
         api.img_ann_tool.set_figure(ann_tool_session, active_figure_id)
+        #api.img_ann_tool.zoom_to_figure(ann_tool_session, active_figure_id, 1.5)
 
 
 @my_app.callback("prev_object")
