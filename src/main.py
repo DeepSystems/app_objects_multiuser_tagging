@@ -118,27 +118,22 @@ def next_object(api: sly.Api, task_id, context, state):
 @my_app.callback("assign_tag")
 @sly.timeit
 def assign_tag(api: sly.Api, task_id, context, state):
-    api.app.set_field(task_id, "state.dialogVisible", True)
+    global user2upc
 
-    # global user2upc
-    #
-    # project_id = context["projectId"]
-    # meta = get_project_meta(api, project_id)
-    #
-    # user_id = context["userId"]
-    # user2selectedUpc = api.app.get_field(task_id, 'data.user2selectedUpc')
-    # selected_tag_index = user2selectedUpc[str(user_id)]
-    # selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
-    #
-    #
-    #
-    # active_figure_id = context["figureId"]
-    # if active_figure_id is None:
-    #     sly.logger.warn("Figure is not selected.")
-    #
-    # tag_meta = meta.get_tag_meta(TAG_NAME)
-    #
-    # api.advanced.add_tag_to_object()
+    project_id = context["projectId"]
+    meta = get_project_meta(api, project_id)
+
+    user_id = context["userId"]
+    user2selectedUpc = api.app.get_field(task_id, 'state.user2selectedUpc')
+    selected_tag_index = user2selectedUpc[str(user_id)]
+    selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
+
+    active_figure_id = context["figureId"]
+    if active_figure_id is None:
+        sly.logger.warn("Figure is not selected.")
+
+    tag_meta = meta.get_tag_meta(TAG_NAME)
+    api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
 
 
 
@@ -160,13 +155,13 @@ def main():
         user2selectedUpc[key] = 0
 
     data = {
-        "user2upc": user2upc,
-        "user2selectedUpc": user2selectedUpc
+        "user2upc": user2upc
     }
 
     # state
     state = {
-        "dialogVisible": False
+        "dialogVisible": False,
+        "user2selectedUpc": user2selectedUpc
     }
 
     # # start event after successful service run

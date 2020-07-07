@@ -26,11 +26,11 @@
         <div style="margin: 10px;">
             <div v-for="(item, index) in data.user2upc[context.userId]">
                 <div style="float: left; width: 47%; border: 3px solid transparent;"
-                 :style="{ borderColor: data.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }">
+                 :style="{ borderColor: state.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }">
                     <h2 style="margin: 10px; text-align: center;">UPC Code: {{item.upc}}</h2>
                     <img style="display: block; width: 100%; object-fit: contain; background: white;"
                          :src="item.image_url"
-                         @click="data.user2selectedUpc[context.userId] = index"
+                         @click="state.user2selectedUpc[context.userId] = index"
                     />
                 </div>
             </div>
