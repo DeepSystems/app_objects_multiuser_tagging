@@ -2,5 +2,5 @@
 	"name": "Retail objects tagging",
 	"description": "Retail objects tagging (multi-user scenario)",
 	"init_script": "src/main.py",
-	"docker_image": "docker.deepsystems.io/supervisely/five/base-py-sdk:import_alpha_images"
+	"docker_image": "docker.deepsystems.io/supervisely/five/py_sdk_private"
 }
