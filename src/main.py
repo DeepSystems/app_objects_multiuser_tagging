@@ -124,7 +124,7 @@ def assign_tag(api: sly.Api, task_id, context, state):
     meta = get_project_meta(api, project_id)
 
     user_id = context["userId"]
-    user2selectedUpc = api.app.get_field(task_id, 'state.user2selectedUpc')
+    user2selectedUpc = state["user2selectedUpc"]
     selected_tag_index = user2selectedUpc[str(user_id)]
     selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
 
