@@ -183,6 +183,4 @@ if __name__ == "__main__":
         })
 
 #@TODO:
-# python -m pip install git+https://github.com/supervisely/supervisely
-# python setup.py develop
 # context + state по всем юзерам? + там будет labelerLogin, api_token, и тд
