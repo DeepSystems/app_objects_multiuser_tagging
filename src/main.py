@@ -21,10 +21,9 @@ metas = {}
 TAG_NAME = 'upc'
 
 
-def get_annotation(api: sly.Api, project_id, image_id):
-    global anns
-    if image_id not in anns:
-        meta = get_project_meta(api, project_id)
+def get_annotation(api: sly.Api, project_id, image_id, figure_id=None):
+    def _download_ann(force=False):
+        meta = get_project_meta(api, project_id, force)
         ann_json = api.annotation.download(image_id).annotation
         ann = sly.Annotation.from_json(ann_json, meta)
 
@@ -33,12 +32,21 @@ def get_annotation(api: sly.Api, project_id, image_id):
         anns[image_id] = ann
         anns_lock.release()
 
+    global anns
+    if image_id not in anns:
+        _download_ann()
+
+    if figure_id is not None:
+        ids = [label.geometry.sly_id for label in anns[image_id].labels]
+        if figure_id not in ids:
+            _download_ann(force=True)
+
     return anns[image_id]
 
 
-def get_project_meta(api: sly.Api, project_id):
+def get_project_meta(api: sly.Api, project_id, force=False):
     global metas
-    if project_id not in metas:
+    if project_id not in metas or force is True:
         meta_json = api.project.get_meta(project_id)
         meta = sly.ProjectMeta.from_json(meta_json)
 
@@ -131,6 +139,37 @@ def assign_tag(api: sly.Api, task_id, context, state, app_logger):
 
     tag_meta = meta.get_tag_meta(TAG_NAME)
     api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
+
+
+@my_app.callback("multi_assign_tag")
+@sly.timeit
+def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
+    global user2upc
+
+    project_id = context["projectId"]
+    image_id = context["imageId"]
+    user_id = context["userId"]
+    user2selectedUpc = state["user2selectedUpc"]
+
+    meta = get_project_meta(api, project_id)
+    selected_tag_index = user2selectedUpc[str(user_id)]
+    selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
+
+    active_figure_id = context["figureId"]
+    if active_figure_id is None:
+        sly.logger.warn("Figure is not selected.")
+
+    ann = get_annotation(api, project_id, image_id, active_figure_id)
+    selected_label = None
+    for label in ann.labels:
+        if label.geometry.sly_id == active_figure_id:
+            selected_label = label
+            break
+
+    tag_meta = meta.get_tag_meta(TAG_NAME)
+    for idx, label in enumerate(ann.labels):
+        if label.geometry.to_bbox().intersects_with(selected_label.geometry.to_bbox()):
+            api.advanced.add_tag_to_object(tag_meta.sly_id, label.geometry.sly_id, value=selected_upc)
 
 
 def main():

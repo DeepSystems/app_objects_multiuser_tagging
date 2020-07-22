@@ -17,7 +17,13 @@
                        type="primary"
                        @click="command('assign_tag')"
                        :disabled="context.figureId === null">
-                Assign tag
+                Assign
+            </el-button>
+            <el-button size="small"
+                       style="margin-left: 10px; margin-right: 10px;"
+                       @click="command('multi_assign_tag')"
+                       :disabled="context.figureId === null">
+                Multi assign
             </el-button>
         </div>
 
