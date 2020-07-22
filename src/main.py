@@ -9,8 +9,8 @@ from supervisely_lib.api.module_api import ApiField
 my_app = sly.AppService()
 
 user2upc = {}
-user2upc_remote_path = "/user2upc_demo.json"
-user2upc_local_path = os.path.join(my_app.app_dir, "user2upc_demo.json")
+user2upc_remote_path = "/retail_tagging/user2upc.json"
+user2upc_local_path = os.path.join(my_app.data_dir, "user2upc.json")
 
 anns_lock = threading.Lock()
 anns = {}
@@ -97,7 +97,7 @@ def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
 
     if active_figure_id is not None:
         api.img_ann_tool.set_figure(ann_tool_session, active_figure_id)
-        #api.img_ann_tool.zoom_to_figure(ann_tool_session, active_figure_id, 1.5)
+        api.img_ann_tool.zoom_to_figure(ann_tool_session, active_figure_id, 2)
 
 
 @my_app.callback("prev_object")
@@ -138,9 +138,9 @@ def main():
     api = sly.Api.from_env()
 
     #@TODO: how to access app start team_id?
-    team_id = 1
+    team_id = 5
 
-    #files_info = api.file.list(team_id, "/")
+    #api.file.exists(team_id, user2upc_remote_path)
     api.file.download(team_id, user2upc_remote_path, user2upc_local_path)
 
     global user2upc
