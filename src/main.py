@@ -9,6 +9,15 @@ from supervisely_lib.api.module_api import ApiField
 my_app = sly.AppService()
 
 user2upc = {}
+
+DIRECTORY_PATH = "/upc_references"
+
+PATH_URL = os.path.join(DIRECTORY_PATH, "upc_ref_url.json")
+PATH_ID = os.path.join(DIRECTORY_PATH, "upc_ref_id.json")
+PATH_INFO = os.path.join(DIRECTORY_PATH, "upc_info.json")
+PATH_RES_UPC_BATCHES = os.path.join(DIRECTORY_PATH, "res_upc_batches.json")
+PATH_RES_USER_UPC_BATCHES = os.path.join(DIRECTORY_PATH, "res_user_upc_batches.json")
+
 user2upc_remote_path = "/retail_tagging/user2upc.json"
 user2upc_local_path = os.path.join(my_app.data_dir, "user2upc.json")
 
