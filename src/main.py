@@ -2,24 +2,27 @@ import sys
 import json
 import os
 import threading
+from collections import defaultdict
 
 import supervisely_lib as sly
 from supervisely_lib.api.module_api import ApiField
 
 my_app = sly.AppService()
 
-user2upc = {}
+user2upc = defaultdict(list)
 
-DIRECTORY_PATH = "/upc_references"
+REMOTE_DIRECTORY_PATH = "/upc_references"
+LOCAL_DIRECTORY_PATH = os.path.join(my_app.data_dir, REMOTE_DIRECTORY_PATH[1:])
+sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
 
-PATH_URL = os.path.join(DIRECTORY_PATH, "upc_ref_url.json")
-PATH_ID = os.path.join(DIRECTORY_PATH, "upc_ref_id.json")
-PATH_INFO = os.path.join(DIRECTORY_PATH, "upc_info.json")
-PATH_RES_UPC_BATCHES = os.path.join(DIRECTORY_PATH, "res_upc_batches.json")
-PATH_RES_USER_UPC_BATCHES = os.path.join(DIRECTORY_PATH, "res_user_upc_batches.json")
+FNAME_URL = "upc_ref_url.json"
+FNAME_ID = "upc_ref_id.json"
+FNAME_INFO = "upc_info.json"
+FNAME_RES_UPC_BATCHES = "res_upc_batches.json"
+FNAME_RES_USER_UPC_BATCHES = "res_user_upc_batches.json"
 
-user2upc_remote_path = "/retail_tagging/user2upc.json"
-user2upc_local_path = os.path.join(my_app.data_dir, "user2upc.json")
+#user2upc_remote_path = "/retail_tagging/user2upc.json"
+#user2upc_local_path = os.path.join(my_app.data_dir, "user2upc.json")
 
 anns_lock = threading.Lock()
 anns = {}
@@ -186,13 +189,31 @@ def main():
     api = sly.Api.from_env()
 
     #@TODO: how to access app start team_id?
-    team_id = 5
+    team_id = 1
+    TEAM_ID = 1
 
-    #api.file.exists(team_id, user2upc_remote_path)
-    api.file.download(team_id, user2upc_remote_path, user2upc_local_path)
+    sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
+    for fname in [FNAME_URL, FNAME_ID, FNAME_INFO, FNAME_RES_UPC_BATCHES, FNAME_RES_USER_UPC_BATCHES]:
+        remote_path = os.path.join(REMOTE_DIRECTORY_PATH, fname)
+        if not api.file.exists(TEAM_ID, remote_path):
+            raise FileExistsError("File {!r} does not exist".format(remote_path))
+        local_path = os.path.join(LOCAL_DIRECTORY_PATH, fname)
+        api.file.download(TEAM_ID, remote_path, local_path)
+
+    upc_url = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_URL))
+    upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_UPC_BATCHES))
+    user_upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_USER_UPC_BATCHES))
 
     global user2upc
-    user2upc = sly.json.load_json_file(user2upc_local_path)
+    # user2upc = sly.json.load_json_file(user2upc_local_path)
+    for user, upc_batches in user_upc_batch.items():
+        for batch_id in upc_batches:
+            for upc_code in upc_batch[str(batch_id)]:
+                for url in upc_url[upc_code]:
+                    url = url.replace("http://quantigo.supervise.ly:11111/", "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
+                    #@TODO: hardcode for quantigo
+                    user2upc[user].append({"upc": upc_code, "image_url": url})
+            break #@TODO: for debug
 
     user2selectedUpc = {}
     for key, value in user2upc.items():
