@@ -183,7 +183,7 @@ def main():
     api.file.download(team_id, user2upc_remote_path, user2upc_local_path)
 
     global user2upc
-    user2upc = sly.io.json.load_json_file(user2upc_local_path)
+    user2upc = sly.json.load_json_file(user2upc_local_path)
 
     user2selectedUpc = {}
     for key, value in user2upc.items():
