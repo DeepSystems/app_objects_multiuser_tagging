@@ -3,13 +3,11 @@ import json
 import os
 import threading
 from collections import defaultdict
-
+from pandas import read_excel
+import numpy as np
 import supervisely_lib as sly
-from supervisely_lib.api.module_api import ApiField
 
 my_app = sly.AppService()
-
-user2upc = defaultdict(list)
 
 REMOTE_DIRECTORY_PATH = "/upc_references"
 LOCAL_DIRECTORY_PATH = os.path.join(my_app.data_dir, REMOTE_DIRECTORY_PATH[1:])
@@ -19,14 +17,13 @@ FNAME_URL = "upc_ref_url.json"
 FNAME_RES_UPC_BATCHES = "res_upc_batches.json"
 FNAME_RES_USER_UPC_BATCHES = "res_user_upc_batches.json"
 FNAME_CATALOG = "product_catalog.xlsx"
-
-
-anns = {}
-
-metas_lock = threading.Lock()
-metas = {}
-
 TAG_NAME = 'upc'
+
+user2upc = defaultdict(list)
+upc2catalog = defaultdict(dict)
+anns = {}
+metas = {}
+metas_lock = threading.Lock()
 
 
 def get_annotation(api: sly.Api, project_id, image_id, figure_id=None):
@@ -181,7 +178,7 @@ def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
 
 def download_remote_files(api, team_id):
     sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
-    for fname in [FNAME_URL, FNAME_RES_UPC_BATCHES, FNAME_RES_USER_UPC_BATCHES]:
+    for fname in [FNAME_URL, FNAME_RES_UPC_BATCHES, FNAME_RES_USER_UPC_BATCHES, FNAME_CATALOG]:
         remote_path = os.path.join(REMOTE_DIRECTORY_PATH, fname)
         if not api.file.exists(team_id, remote_path):
             raise FileExistsError("File {!r} does not exist".format(remote_path))
@@ -204,16 +201,32 @@ def init_user_2_upc():
                     # @TODO: hardcode for quantigo
                     user2upc[user].append({"upc": upc_code, "image_url": url})
 
+def init_catalog():
+    global upc2catalog
+    sheets = read_excel(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_CATALOG), sheet_name=None)
+    catalog = sheets[list(sheets.keys())[0]]  # get first sheet from excel
+    sly.logger.info("Size of catalog: {}".format(len(catalog)))
+
+    upcs = list(catalog["UPC CODE"])
+    # upc = '7861042566762'
+    for upc in upcs:
+        res = catalog[catalog['UPC CODE'] == np.int64(upc)]
+        info = json.loads(res.to_json(orient="records"))
+        if len(info) != 1:
+            info = {}
+        else:
+            info = info[0]
+        upc2catalog[upc] = info
+
 def main():
     # data
     api = sly.Api.from_env()
 
     #@TODO: how to access app start team_id?
-    team_id = 1
-    TEAM_ID = 1
-
+    team_id = 5
     download_remote_files(api, team_id)
     init_user_2_upc()
+    init_catalog()
 
     user2selectedUpc = {}
     for key, value in user2upc.items():
