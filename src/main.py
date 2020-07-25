@@ -185,28 +185,33 @@ def download_remote_files(api, team_id):
         local_path = os.path.join(LOCAL_DIRECTORY_PATH, fname)
         api.file.download(team_id, remote_path, local_path)
 
-def init_user_2_upc():
+def init_user_2_upc(api):
     upc_url = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_URL))
     upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_UPC_BATCHES))
     user_upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_USER_UPC_BATCHES))
 
     global user2upc
-    # user2upc = sly.json.load_json_file(user2upc_local_path)
     for user, upc_batches in user_upc_batch.items():
         for batch_id in upc_batches:
             for upc_code in upc_batch[str(batch_id)]:
                 for url in upc_url[upc_code]:
+                    # @TODO: hardcode for quantigo
                     url = url.replace("http://quantigo.supervise.ly:11111/",
                                       "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
-                    # @TODO: hardcode for quantigo
-                    user2upc[user].append({"upc": upc_code, "image_url": url})
+                    #@TODO: only for debug
+                    user = "max"
+                    user_info = api.user.get_member_info_by_login(user)
+                    #@TODO: uncomment after debug
+                    if user_info is None:
+                        raise RuntimeError("User {!r} no found on instance".format(user))
+                    user = user_info.id
+                    user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
 
 def init_catalog():
     global upc2catalog
     sheets = read_excel(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_CATALOG), sheet_name=None)
     catalog = sheets[list(sheets.keys())[0]]  # get first sheet from excel
     sly.logger.info("Size of catalog: {}".format(len(catalog)))
-
     upcs = list(catalog["UPC CODE"])
     # upc = '7861042566762'
     for upc in upcs:
@@ -225,7 +230,7 @@ def main():
     #@TODO: how to access app start team_id?
     team_id = 5
     download_remote_files(api, team_id)
-    init_user_2_upc()
+    init_user_2_upc(api)
     init_catalog()
 
     user2selectedUpc = {}
