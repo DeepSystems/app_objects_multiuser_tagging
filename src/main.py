@@ -192,20 +192,21 @@ def init_user_2_upc(api, team_id):
 
     global user2upc
     for user, upc_batches in user_upc_batch.items():
+        # @TODO: only for debug
+        user = "admin"
+        user_info = api.user.get_member_info_by_login(team_id, user)
+        if user_info is None:
+            team_info = api.team.get_info_by_id(team_id)
+            raise RuntimeError("User {!r} no found in team {!r}".format(user, team_info.name))
         for batch_id in upc_batches:
             for upc_code in upc_batch[str(batch_id)]:
                 for url in upc_url[upc_code]:
                     # @TODO: hardcode for quantigo
                     url = url.replace("http://quantigo.supervise.ly:11111/",
                                       "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
-                    #@TODO: only for debug
-                    user = "max"
-                    user_info = api.user.get_member_info_by_login(team_id, user)
-                    #@TODO: uncomment after debug
-                    if user_info is None:
-                        raise RuntimeError("User {!r} no found on instance".format(user))
-                    user = user_info.id
                     user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
+        #@TODO: only for debug
+        break
 
 def init_catalog():
     global upc2catalog
