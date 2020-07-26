@@ -185,7 +185,7 @@ def download_remote_files(api, team_id):
         local_path = os.path.join(LOCAL_DIRECTORY_PATH, fname)
         api.file.download(team_id, remote_path, local_path)
 
-def init_user_2_upc(api):
+def init_user_2_upc(api, team_id):
     upc_url = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_URL))
     upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_UPC_BATCHES))
     user_upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_USER_UPC_BATCHES))
@@ -200,7 +200,7 @@ def init_user_2_upc(api):
                                       "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
                     #@TODO: only for debug
                     user = "max"
-                    user_info = api.user.get_member_info_by_login(user)
+                    user_info = api.user.get_member_info_by_login(team_id, user)
                     #@TODO: uncomment after debug
                     if user_info is None:
                         raise RuntimeError("User {!r} no found on instance".format(user))
@@ -230,7 +230,7 @@ def main():
     #@TODO: how to access app start team_id?
     team_id = 5
     download_remote_files(api, team_id)
-    init_user_2_upc(api)
+    init_user_2_upc(api, team_id)
     init_catalog()
 
     user2selectedUpc = {}
@@ -268,6 +268,10 @@ if __name__ == "__main__":
             'event_type': sly.EventType.TASK_CRASHED,
             'exc_str': str(e),
         })
+        # loglevel = os.getenv('LOG_LEVEL', 'TRACE')
+        import logging
+        if logging.getLevelName(sly.logger.level) in ["TRACE", "DEBUG"]:
+            raise e
 
 #@TODO:
 # context + state по всем юзерам? + там будет labelerLogin, api_token, и тд
