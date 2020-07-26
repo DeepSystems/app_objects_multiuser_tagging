@@ -238,8 +238,15 @@ def main():
     for key, value in user2upc.items():
         user2selectedUpc[key] = 0
 
+    user2upcIndex2Info = defaultdict(dict)
+    for user_id, upcs in user2upc.items():
+        for idx, upc_link in enumerate(upcs):
+            info = upc2catalog[np.int64(upc_link["upc"])]
+            user2upcIndex2Info[user_id][idx] = info
+
     data = {
-        "user2upc": user2upc
+        "user2upc": user2upc,
+        "user2upcIndex2Info": user2upcIndex2Info
     }
 
     # state

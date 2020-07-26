@@ -1,61 +1,69 @@
 <div>
-    <div v-if="context.userId in data.user2upc">
-        <div style="position: fixed; background: white; width: 100%; padding: 8px 0;">
-            <el-button size="small"
-                       icon="arrow-left"
-                       style="margin-left: 10px;"
-                       @click="command('prev_object')">
-                Prev Object
-            </el-button>
-            <el-button size="small"
-                       style="margin-left: 10px;"
-                       @click="command('next_object')">
-                Next Object<i class="el-icon-arrow-right el-icon-right"></i>
-            </el-button>
-            <el-button size="small"
-                       style="margin-left: 10px; margin-right: 10px;"
-                       type="primary"
-                       @click="command('assign_tag')"
-                       :disabled="context.figureId === null">
-                Assign
-            </el-button>
-            <el-button size="small"
-                       style="margin-left: 10px; margin-right: 10px;"
-                       @click="command('multi_assign_tag')"
-                       :disabled="context.figureId === null">
-                Multi assign
-            </el-button>
-        </div>
-
-        <br/>
-        <br/>
-        <hr style="height: 1px; color: #e0e0e0; background-color: #e0e0e0; border: none;"/>
-
-        <div style="margin: 10px;">
-            <div v-for="(item, index) in data.user2upc[context.userId]">
-                <div style="float: left; width: 47%; border: 3px solid transparent;"
-                 :style="{ borderColor: state.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }">
-                    <h2 style="margin: 10px; text-align: center;">UPC Code: {{item.upc}}</h2>
-                    <img style="display: block; width: 100%; object-fit: contain; background: white;"
-                         :src="item.image_url"
-                         @click="state.user2selectedUpc[context.userId] = index"
-                    />
+    <el-tabs type="card">
+        <el-tab-pane label="Catalog">
+            <div v-if="context.userId in data.user2upc">
+                <div style="position: fixed; background: white; width: 100%; padding: 8px 0;">
+                    <el-button size="small"
+                               icon="arrow-left"
+                               style="margin-left: 10px;"
+                               @click="command('prev_object')">
+                        Prev Object
+                    </el-button>
+                    <el-button size="small"
+                               style="margin-left: 10px;"
+                               @click="command('next_object')">
+                        Next Object<i class="el-icon-arrow-right el-icon-right"></i>
+                    </el-button>
+                    <el-button size="small"
+                               style="margin-left: 10px; margin-right: 10px;"
+                               type="primary"
+                               @click="command('assign_tag')"
+                               :disabled="context.figureId === null">
+                        Assign
+                    </el-button>
+                    <el-button size="small"
+                               style="margin-left: 10px; margin-right: 10px;"
+                               @click="command('multi_assign_tag')"
+                               :disabled="context.figureId === null">
+                        Multi assign
+                    </el-button>
                 </div>
+
+                <br/>
+                <br/>
+                <hr style="height: 1px; color: #e0e0e0; background-color: #e0e0e0; border: none;"/>
+
+                <div style="margin: 10px;">
+                    <div v-for="(item, index) in data.user2upc[context.userId]">
+                        <div style="float: left; width: 47%; border: 3px solid transparent;"
+                         :style="{ borderColor: state.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }">
+                            <h2 style="margin: 10px; text-align: center;">UPC Code: {{item.upc}}</h2>
+                            <img style="display: block; width: 100%; object-fit: contain; background: white;"
+                                 :src="item.image_url"
+                                 @click="state.user2selectedUpc[context.userId] = index"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <el-dialog
+                  title="Image Done"
+                  :visible.sync="state.dialogVisible"
+                  size="tiny">
+                  <span>All objects are viewed. Move to next image</span>
+                  <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="state.dialogVisible = false">Confirm</el-button>
+                  </span>
+                </el-dialog>
             </div>
-        </div>
-
-        <el-dialog
-          title="Image Done"
-          :visible.sync="state.dialogVisible"
-          size="tiny">
-          <span>All objects are viewed. Move to next image</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="state.dialogVisible = false">Confirm</el-button>
-          </span>
-        </el-dialog>
-
-    </div>
-    <div v-if="!(context.userId in data.user2upc)">
+            <div v-if="!(context.userId in data.user2upc)">
         <div>User with id = {{context.userId}} is not allowed for this app</div>
     </div>
+        </el-tab-pane>
+        <el-tab-pane label="UPC Info">
+            <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>
+        </el-tab-pane>
+        <el-tab-pane label="UPC Gallery">Role
+        </el-tab-pane>
+    </el-tabs>
 </div>
