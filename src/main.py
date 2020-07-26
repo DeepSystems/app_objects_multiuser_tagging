@@ -201,10 +201,13 @@ def init_user_2_upc(api, team_id):
         for batch_id in upc_batches:
             for upc_code in upc_batch[str(batch_id)]:
                 for url in upc_url[upc_code]:
-                    # @TODO: hardcode for quantigo
                     url = url.replace("http://quantigo.supervise.ly:11111/",
                                       "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
+                    #if "_full"in url:
+                    #    continue
+                    # @TODO: hardcode for quantigo
                     user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
+                    #@TODO: add all urls to gallery and cropped usrls to thumbnail
         #@TODO: only for debug
         break
 
