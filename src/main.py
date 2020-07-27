@@ -300,17 +300,19 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        sly.logger.critical('Unexpected exception in main.', exc_info=True, extra={
-            'event_type': sly.EventType.TASK_CRASHED,
-            'exc_str': str(e),
-        })
-        # loglevel = os.getenv('LOG_LEVEL', 'TRACE')
-        import logging
-        if logging.getLevelName(sly.logger.level) in ["TRACE", "DEBUG"]:
-            raise e
+    sly.main_wrapper("main", main)
+
+    # try:
+    #     main()
+    # except Exception as e:
+    #     sly.logger.critical('Unexpected exception in main.', exc_info=True, extra={
+    #         'event_type': sly.EventType.TASK_CRASHED,
+    #         'exc_str': str(e),
+    #     })
+    #     # loglevel = os.getenv('LOG_LEVEL', 'TRACE')
+    #     import logging
+    #     if logging.getLevelName(sly.logger.level) in ["TRACE", "DEBUG"]:
+    #         raise e
 
 #@TODO:
 # context + state по всем юзерам? + там будет labelerLogin, api_token, и тд
