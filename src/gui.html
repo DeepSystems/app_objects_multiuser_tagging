@@ -1,8 +1,16 @@
-<div>
+<div id="app_retail_tagging">
     <div v-if="context.userId in data.user2upc">
+        <sly-style>
+            #app_retail_tagging  .el-tabs__header {
+                background: white;
+                position: fixed;
+                width: 100%;
+                z-index: 1;
+            }
+        </sly-style>
         <el-tabs type="card">
             <el-tab-pane label="Catalog">
-                <div style="position: fixed; background: white; width: 100%; padding: 8px 0;">
+                <div style="position: fixed; background: white; width: 100%; padding: 8px 0; margin-top: 42px;">
                     <el-button @click="command('prev_object')"
                                icon="arrow-left"
                                size="small"
@@ -60,7 +68,7 @@
                 <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>
             </el-tab-pane>
             <el-tab-pane label="UPC Gallery">
-                <sly-gallery :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
+                <sly-gallery height="300px" :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
     <!--            <sly-gallery :content="data.demoGallery"/>-->
             </el-tab-pane>
         </el-tabs>
