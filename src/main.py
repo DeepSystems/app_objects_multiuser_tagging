@@ -106,6 +106,7 @@ def get_next_id(ann: sly.Annotation, active_figure_id):
                 return label.geometry.sly_id
     return None
 
+
 def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
     user_id = context["userId"]
     image_id = context["imageId"]
@@ -150,7 +151,7 @@ def assign_tag(api: sly.Api, task_id, context, state, app_logger):
     user_id = context["userId"]
     user2selectedUpc = state["user2selectedUpc"]
     selected_tag_index = user2selectedUpc[str(user_id)]
-    selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
+    selected_upc = user2upc[user_id][selected_tag_index]["upc"]
 
     active_figure_id = context["figureId"]
     if active_figure_id is None:
@@ -172,7 +173,7 @@ def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
 
     meta = get_project_meta(api, project_id)
     selected_tag_index = user2selectedUpc[str(user_id)]
-    selected_upc = user2upc[str(user_id)][selected_tag_index]["upc"]
+    selected_upc = user2upc[user_id][selected_tag_index]["upc"]
 
     active_figure_id = context["figureId"]
     if active_figure_id is None:
