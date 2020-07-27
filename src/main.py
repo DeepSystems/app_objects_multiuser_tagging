@@ -210,7 +210,7 @@ def init_user_2_upc(api, team_id):
 
     for user, upc_batches in user_upc_batch.items():
         # @TODO: only for debug
-        user = "admin"
+        #user = "admin"
         user_info = api.user.get_member_info_by_login(team_id, user)
         if user_info is None:
             team_info = api.team.get_info_by_id(team_id)
@@ -220,8 +220,8 @@ def init_user_2_upc(api, team_id):
                 first_url = True
                 for url in upc_url[upc_code]:
                     # @TODO: hardcode for quantigo
-                    url = url.replace("http://quantigo.supervise.ly:11111/",
-                                      "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
+                    #url = url.replace("http://quantigo.supervise.ly:11111/",
+                    #                  "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
                     upc_gallery[upc_code].append([url])
                     if "_full" in url:
                         continue
@@ -230,7 +230,7 @@ def init_user_2_upc(api, team_id):
                     first_url = False
                     user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
         #@TODO: only for debug
-        break
+        #break
 
 def init_catalog():
     global upc2catalog
