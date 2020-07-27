@@ -1,30 +1,30 @@
 <div>
-    <el-tabs type="card">
-        <el-tab-pane label="Catalog">
-            <div v-if="context.userId in data.user2upc">
+    <div v-if="context.userId in data.user2upc">
+        <el-tabs type="card">
+            <el-tab-pane label="Catalog">
                 <div style="position: fixed; background: white; width: 100%; padding: 8px 0;">
-                    <el-button size="small"
+                    <el-button @click="command('prev_object')"
                                icon="arrow-left"
-                               style="margin-left: 10px;"
-                               @click="command('prev_object')">
+                               size="small"
+                               style="margin-left: 10px;">
                         Prev Object
                     </el-button>
-                    <el-button size="small"
-                               style="margin-left: 10px;"
-                               @click="command('next_object')">
+                    <el-button @click="command('next_object')"
+                               size="small"
+                               style="margin-left: 10px;">
                         Next Object<i class="el-icon-arrow-right el-icon-right"></i>
                     </el-button>
-                    <el-button size="small"
-                               style="margin-left: 10px; margin-right: 10px;"
-                               type="primary"
+                    <el-button :disabled="context.figureId === null"
                                @click="command('assign_tag')"
-                               :disabled="context.figureId === null">
+                               size="small"
+                               style="margin-left: 10px; margin-right: 10px;"
+                               type="primary">
                         Assign
                     </el-button>
-                    <el-button size="small"
-                               style="margin-left: 10px; margin-right: 10px;"
+                    <el-button :disabled="context.figureId === null"
                                @click="command('multi_assign_tag')"
-                               :disabled="context.figureId === null">
+                               size="small"
+                               style="margin-left: 10px; margin-right: 10px;">
                         Multi assign
                     </el-button>
                 </div>
@@ -35,37 +35,37 @@
 
                 <div style="margin: 10px;">
                     <div v-for="(item, index) in data.user2upc[context.userId]">
-                        <div style="float: left; width: 47%; border: 3px solid transparent;"
-                         :style="{ borderColor: state.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }">
+                        <div :style="{ borderColor: state.user2selectedUpc[context.userId] === index ? '#20A0FF' : 'transparent' }"
+                         style="float: left; width: 47%; border: 3px solid transparent;">
                             <h2 style="margin: 10px; text-align: center;">UPC Code: {{item.upc}}</h2>
-                            <img style="display: block; width: 100%; object-fit: contain; background: white;"
-                                 :src="item.image_url"
+                            <img :src="item.image_url"
                                  @click="state.user2selectedUpc[context.userId] = index"
+                                 style="display: block; width: 100%; object-fit: contain; background: white;"
                             />
                         </div>
                     </div>
                 </div>
 
                 <el-dialog
-                  title="Image Done"
                   :visible.sync="state.dialogVisible"
-                  size="tiny">
+                  size="tiny"
+                  title="Image Done">
                   <span>All objects are viewed. Move to next image</span>
-                  <span slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="state.dialogVisible = false">Confirm</el-button>
+                  <span class="dialog-footer" slot="footer">
+                    <el-button @click="state.dialogVisible = false" type="primary">Confirm</el-button>
                   </span>
                 </el-dialog>
-            </div>
-            <div v-if="!(context.userId in data.user2upc)">
+            </el-tab-pane>
+            <el-tab-pane label="UPC Info">
+                <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>
+            </el-tab-pane>
+            <el-tab-pane label="UPC Gallery">
+                <sly-gallery :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
+    <!--            <sly-gallery :content="data.demoGallery"/>-->
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+    <div v-if="!(context.userId in data.user2upc)">
         <div>User with id = {{context.userId}} is not allowed for this app</div>
     </div>
-        </el-tab-pane>
-        <el-tab-pane label="UPC Info">
-            <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>
-        </el-tab-pane>
-        <el-tab-pane label="UPC Gallery">
-            <sly-gallery :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
-<!--            <sly-gallery :content="data.demoGallery"/>-->
-        </el-tab-pane>
-    </el-tabs>
 </div>
