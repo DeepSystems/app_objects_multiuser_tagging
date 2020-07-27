@@ -19,9 +19,14 @@ FNAME_RES_USER_UPC_BATCHES = "res_user_upc_batches.json"
 FNAME_CATALOG = "product_catalog.xlsx"
 TAG_NAME = 'upc'
 
+PRODUCT_CLASS_NAME = "Product"
+
 user2upc = defaultdict(list)
 upc2catalog = defaultdict(dict)
+upc_gallery = defaultdict(list)
+
 anns = {}
+anns_lock = threading.Lock()
 metas = {}
 metas_lock = threading.Lock()
 
@@ -73,23 +78,34 @@ def get_project_meta(api: sly.Api, project_id, force=False):
 
 
 def get_first_id(ann: sly.Annotation):
-    return ann.labels[0].geometry.sly_id
+    for idx, label in enumerate(ann.labels):
+        if label.obj_class.name == PRODUCT_CLASS_NAME:
+            return label.geometry.sly_id
+    return None
 
 
 def get_prev_id(ann: sly.Annotation, active_figure_id):
+    prev_idx = None
     for idx, label in enumerate(ann.labels):
         if label.geometry.sly_id == active_figure_id:
-            if idx == 0:
+            if prev_idx is None:
                 return None
-            return ann.labels[idx - 1].geometry.sly_id
+            return ann.labels[prev_idx].geometry.sly_id
+        if label.obj_class.name == PRODUCT_CLASS_NAME:
+            prev_idx = idx
 
 
 def get_next_id(ann: sly.Annotation, active_figure_id):
+    need_search = False
     for idx, label in enumerate(ann.labels):
         if label.geometry.sly_id == active_figure_id:
+            need_search = True
+            continue
+        if need_search:
             if idx == len(ann.labels) - 1:
                 return None
-            return ann.labels[idx + 1].geometry.sly_id
+            if label.obj_class.name == PRODUCT_CLASS_NAME:
+                return label.geometry.sly_id
 
 
 def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
@@ -190,7 +206,8 @@ def init_user_2_upc(api, team_id):
     upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_UPC_BATCHES))
     user_upc_batch = sly.json.load_json_file(os.path.join(LOCAL_DIRECTORY_PATH, FNAME_RES_USER_UPC_BATCHES))
 
-    global user2upc
+    global user2upc, upc_gallery
+
     for user, upc_batches in user_upc_batch.items():
         # @TODO: only for debug
         user = "admin"
@@ -200,14 +217,18 @@ def init_user_2_upc(api, team_id):
             raise RuntimeError("User {!r} no found in team {!r}".format(user, team_info.name))
         for batch_id in upc_batches:
             for upc_code in upc_batch[str(batch_id)]:
+                first_url = True
                 for url in upc_url[upc_code]:
+                    # @TODO: hardcode for quantigo
                     url = url.replace("http://quantigo.supervise.ly:11111/",
                                       "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
-                    #if "_full"in url:
-                    #    continue
-                    # @TODO: hardcode for quantigo
+                    upc_gallery[upc_code].append([url])
+                    if "_full" in url:
+                        continue
+                    if first_url is False:
+                        continue
+                    first_url = False
                     user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
-                    #@TODO: add all urls to gallery and cropped usrls to thumbnail
         #@TODO: only for debug
         break
 
@@ -247,9 +268,17 @@ def main():
             info = upc2catalog[np.int64(upc_link["upc"])]
             user2upcIndex2Info[user_id][idx] = info
 
+    user2upcIndex2upcGallery = defaultdict(lambda: defaultdict(dict))
+    for user_id, upcs in user2upc.items():
+        for idx, upc_link in enumerate(upcs):
+            g = upc_gallery[upc_link["upc"]]
+            user2upcIndex2upcGallery[user_id][idx] = g
+
     data = {
         "user2upc": user2upc,
-        "user2upcIndex2Info": user2upcIndex2Info
+        "user2upcIndex2Info": user2upcIndex2Info,
+        "user2upcIndex2upcGallery": user2upcIndex2upcGallery,
+        "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]]
     }
 
     # state

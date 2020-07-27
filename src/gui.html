@@ -63,7 +63,9 @@
         <el-tab-pane label="UPC Info">
             <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>
         </el-tab-pane>
-        <el-tab-pane label="UPC Gallery">Role
+        <el-tab-pane label="UPC Gallery">
+            <sly-gallery :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
+<!--            <sly-gallery :content="data.demoGallery"/>-->
         </el-tab-pane>
     </el-tabs>
 </div>
