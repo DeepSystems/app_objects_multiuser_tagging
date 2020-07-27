@@ -17,7 +17,7 @@ FNAME_URL = "upc_ref_url.json"
 FNAME_RES_UPC_BATCHES = "res_upc_batches.json"
 FNAME_RES_USER_UPC_BATCHES = "res_user_upc_batches.json"
 FNAME_CATALOG = "product_catalog.xlsx"
-TAG_NAME = 'upc'
+TAG_NAME = 'UPC CODE'
 
 PRODUCT_CLASS_NAME = "Product"
 
