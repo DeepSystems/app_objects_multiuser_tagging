@@ -252,8 +252,7 @@ def main():
     # data
     api = sly.Api.from_env()
 
-    #@TODO: how to access app start team_id?
-    team_id = 5
+    team_id = os.environ["TEAM_ID"]
     download_remote_files(api, team_id)
     init_user_2_upc(api, team_id)
     init_catalog()
