@@ -102,11 +102,9 @@ def get_next_id(ann: sly.Annotation, active_figure_id):
             need_search = True
             continue
         if need_search:
-            if idx == len(ann.labels) - 1:
-                return None
             if label.obj_class.name == PRODUCT_CLASS_NAME:
                 return label.geometry.sly_id
-
+    return None
 
 def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
     user_id = context["userId"]
@@ -249,7 +247,6 @@ def init_catalog():
         upc2catalog[upc] = info
 
 def main():
-    # data
     api = sly.Api.from_env()
 
     team_id = os.environ["TEAM_ID"]
