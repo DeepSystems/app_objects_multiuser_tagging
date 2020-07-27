@@ -210,7 +210,7 @@ def init_user_2_upc(api, team_id):
 
     for user, upc_batches in user_upc_batch.items():
         # @TODO: only for debug
-        user = "admin"
+        user = "max"
         user_info = api.user.get_member_info_by_login(team_id, user)
         if user_info is None:
             team_info = api.team.get_info_by_id(team_id)
