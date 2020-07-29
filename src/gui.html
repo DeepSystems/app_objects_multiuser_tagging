@@ -78,35 +78,14 @@
     <!--            <sly-gallery :content="data.demoGallery"/>-->
             </el-tab-pane>
             <el-tab-pane label="Search">
-<!--                <div class="fflex">-->
-<!--                    <br/>-->
-<!--                    <br/>-->
-<!--                    <br/>-->
-<!--&lt;!&ndash;                    <pre>{{ data.user2upcIndex2Info[context.userId][state.user2selectedUpc[context.userId]] }}</pre>&ndash;&gt;-->
-<!--                    <el-select v-model="state.selectedKeywords"-->
-<!--                               multiple-->
-<!--                               filterable-->
-<!--                               :allow-create="true"-->
-<!--                               placeholder="Please enter a keyword"-->
-<!--                               style="width: 100%;-->
-<!--                               margin-right: 10px;">-->
-<!--                        <el-option-->
-<!--                        v-for="item in data.keywords"-->
-<!--                        :key="item"-->
-<!--                        :label="item"-->
-<!--                        :value="item">-->
-<!--                        </el-option>-->
-<!--                    </el-select>-->
-<!--                </div>-->
                 <br/><br/><br/>
-                <div class="fflex">
+                <div class="fflex" style="margin-right: 15px; margin-left: 3px">
                     <el-select v-model="state.selectedKeywords"
                                multiple
                                filterable
                                :allow-create="true"
                                placeholder="Please enter a keyword"
-                               style="width: 100%;
-                               margin-right: 10px;">
+                               style="width: 100%; margin-right: 10px;">
                         <el-option
                         v-for="item in data.keywords"
                         :key="item"
