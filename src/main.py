@@ -261,9 +261,11 @@ def init_search_catalog():
 
         if link is not None:
             info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
-        else:
-            info["image"] = ""
-        full_catalog.append(info)
+            full_catalog.append(info)
+        # skip upc code
+        #else:
+        #    info["image"] = ""
+
 
 def main():
     api = sly.Api.from_env()
