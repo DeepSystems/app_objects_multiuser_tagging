@@ -77,6 +77,25 @@
                 <sly-gallery height="300px" :auto-reset="true" :content="data.user2upcIndex2upcGallery[context.userId][state.user2selectedUpc[context.userId]]"/>
     <!--            <sly-gallery :content="data.demoGallery"/>-->
             </el-tab-pane>
+            <el-tab-pane label="Search">
+                <div class="fflex">
+                    <el-select v-model="state.selectedKeywords"
+                               multiple
+                               filterable
+                               :allow-create="true"
+                               placeholder="Please enter a keyword"
+                               style="width: 100%;
+                               margin-right: 10px;">
+                        <el-option
+                        v-for="item in data.keywords"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                        </el-option>
+                    </el-select>
+                    <el-button icon="search" size="small" :loading="state.searching" @click="command('search_items')"></el-button>
+                </div>
+            </el-tab-pane>
         </el-tabs>
     </div>
     <div v-if="!(context.userId in data.user2upc)">

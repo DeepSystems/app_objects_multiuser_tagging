@@ -275,13 +275,16 @@ def main():
         "user2upc": user2upc,
         "user2upcIndex2Info": user2upcIndex2Info,
         "user2upcIndex2upcGallery": user2upcIndex2upcGallery,
-        "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]]
+        "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]],
+        "keywords": ["aaa", "bbb", "ccc"]
     }
 
     # state
     state = {
         "dialogVisible": False,
-        "user2selectedUpc": user2selectedUpc
+        "user2selectedUpc": user2selectedUpc,
+        "selectedKeywords": [],
+        "searching": False
     }
 
     # # start event after successful service run
