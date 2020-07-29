@@ -251,12 +251,13 @@ def init_catalog():
 def init_search_catalog():
     global upc2catalog
     global full_catalog
+    global upc_gallery
     for upc_int64, info in upc2catalog.items():
         link = None
-        links = []
         if str(upc_int64) in upc_gallery:
-            links = upc_gallery[str(upc_int64)]
-            link = links[0][0]
+            link = upc_gallery[str(upc_int64)][0][0]
+        else:
+            upc_gallery[str(upc_int64)] = []
 
         if link is not None:
             info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
@@ -308,7 +309,7 @@ def main():
         "searching": False,
         "perPage": 10,
         "pageSizes": [5, 10, 20],
-        "selectedRow": None
+        "selectedRowData": full_catalog[0]
     }
 
     # # start event after successful service run
