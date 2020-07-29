@@ -24,6 +24,7 @@ PRODUCT_CLASS_NAME = "Product"
 user2upc = defaultdict(list)
 upc2catalog = defaultdict(dict)
 upc_gallery = defaultdict(list)
+full_catalog = []
 
 anns = {}
 anns_lock = threading.Lock()
@@ -247,6 +248,22 @@ def init_catalog():
             info = info[0]
         upc2catalog[upc] = info
 
+def init_search_catalog():
+    global upc2catalog
+    global full_catalog
+    for upc_int64, info in upc2catalog.items():
+        link = None
+        links = []
+        if str(upc_int64) in upc_gallery:
+            links = upc_gallery[str(upc_int64)]
+            link = links[0][0]
+
+        if link is not None:
+            info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
+        else:
+            info["image"] = ""
+        full_catalog.append(info)
+
 def main():
     api = sly.Api.from_env()
 
@@ -271,20 +288,27 @@ def main():
             g = upc_gallery[upc_link["upc"]]
             user2upcIndex2upcGallery[user_id][idx] = g
 
+    init_search_catalog()
+    global full_catalog
+
     data = {
         "user2upc": user2upc,
         "user2upcIndex2Info": user2upcIndex2Info,
         "user2upcIndex2upcGallery": user2upcIndex2upcGallery,
         "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]],
-        "keywords": ["aaa", "bbb", "ccc"]
+        "keywords": ["aaa", "bbb", "ccc"],
+        "fullCatalog": full_catalog,
+        "upcGallery": upc_gallery
     }
 
-    # state
     state = {
         "dialogVisible": False,
         "user2selectedUpc": user2selectedUpc,
         "selectedKeywords": [],
-        "searching": False
+        "searching": False,
+        "perPage": 10,
+        "pageSizes": [5, 10, 20],
+        "selectedRow": None
     }
 
     # # start event after successful service run
