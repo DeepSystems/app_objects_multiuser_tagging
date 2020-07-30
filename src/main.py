@@ -280,20 +280,22 @@ def init_search_catalog():
             #   content="this is content, this is content, this is content">
             # </el-popover>
             # """.format(popover_id)
-            #
             # #button = "<el-button v-popover:popover{} size=\"mini\">ref image</el-button>".format(popover_id)
+            # popover_id += 1
             # button = "<el-button size=\"mini\">ref image</el-button>"
-            # new_info["image"] = "<div>{}</div>".format(button)#'<img style="height:50px; width:auto;" src="{}"/>'.format(link)
-            element = """
-            <div class="popover-wrapper">
-                <div class="trigger">hover me</div>
-                <div class="popover-content">
-                  <img src="{}" />
-                </div>
-            </div>
-            """.format(link)
-            new_info["image"] = element
-            popover_id += 1
+
+            new_info["image"] = '<img style="height:80px; width:auto;" src="{}"/>'.format(link)
+
+            # element = """
+            # <div class="popover-wrapper">
+            #     <div class="trigger">hover me</div>
+            #     <div class="popover-content">
+            #       <img src="{}" />
+            #     </div>
+            # </div>
+            # """.format(link)
+            # new_info["image"] = element
+
         # skip upc code
         else:
             info["image"] = ""
