@@ -161,6 +161,13 @@ def assign_tag(api: sly.Api, task_id, context, state, app_logger):
     selected_upc = user2upc[user_id][selected_tag_index]["upc"]
     _assign_tag(api, context, selected_upc)
 
+@my_app.callback("assign_tag_catalog")
+@sly.timeit
+def assign_tag_catalog(api: sly.Api, task_id, context, state, app_logger):
+    user_id = context["userId"]
+    selected_upc = state["user2selectedRowData"][user_id]['UPC CODE']
+    _assign_tag(api, context, selected_upc)
+
 def _multi_assign_tag(api, context, selected_upc):
     project_id = context["projectId"]
     image_id = context["imageId"]
@@ -191,6 +198,14 @@ def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
     selected_tag_index = user2selectedUpc[str(user_id)]
     selected_upc = user2upc[user_id][selected_tag_index]["upc"]
     _multi_assign_tag(api, context, selected_upc)
+
+@my_app.callback("multi_assign_tag_catalog")
+@sly.timeit
+def multi_assign_tag_catalog(api: sly.Api, task_id, context, state, app_logger):
+    user_id = context["userId"]
+    selected_upc = state["user2selectedRowData"][user_id]['UPC CODE']
+    _multi_assign_tag(api, context, selected_upc)
+
 
 def download_remote_files(api, team_id):
     sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
