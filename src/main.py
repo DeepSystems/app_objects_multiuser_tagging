@@ -338,7 +338,6 @@ def main():
         "user2upcIndex2Info": user2upcIndex2Info,
         "user2upcIndex2upcGallery": user2upcIndex2upcGallery,
         "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]],
-        "keywords": ["aaa", "bbb", "ccc"],
         "fullCatalog": full_catalog,
         "upcGallery": upc_gallery
     }
