@@ -1,13 +1,37 @@
 <div id="app_retail_tagging">
     <div v-if="context.userId in data.user2upc">
         <sly-style>
-            #app_retail_tagging  .el-tabs__header {
+            #app_retail_tagging .el-tabs__header {
                 background: white;
                 position: fixed;
                 width: 100%;
                 z-index: 1;
             }
+
+            #app_retail_tagging .popover-wrapper {
+                position: relative;
+                display: inline-block;
+            }
+
+            #app_retail_tagging .popover-wrapper:hover .popover-content {
+                display: initial;
+            }
+
+            #app_retail_tagging .popover-wrapper .popover-content {
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 1;
+            }
+
+            #app_retail_tagging .popover-wrapper .popover-content img {
+                height: 150px;
+                width: auto;
+            }
         </sly-style>
+
+
         <el-tabs type="card">
             <el-tab-pane label="Catalog">
                 <div style="position: fixed; background: white; width: 100%; padding: 8px 0; margin-top: 42px;">

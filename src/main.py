@@ -199,6 +199,7 @@ def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
     selected_upc = user2upc[user_id][selected_tag_index]["upc"]
     _multi_assign_tag(api, context, selected_upc)
 
+
 @my_app.callback("multi_assign_tag_catalog")
 @sly.timeit
 def multi_assign_tag_catalog(api: sly.Api, task_id, context, state, app_logger):
@@ -224,8 +225,6 @@ def init_user_2_upc(api, team_id):
     global user2upc, upc_gallery
 
     for user, upc_batches in user_upc_batch.items():
-        # @TODO: only for debug
-        #user = "admin"
         user_info = api.user.get_member_info_by_login(team_id, user)
         if user_info is None:
             team_info = api.team.get_info_by_id(team_id)
@@ -234,9 +233,6 @@ def init_user_2_upc(api, team_id):
             for upc_code in upc_batch[str(batch_id)]:
                 first_url = True
                 for url in upc_url[upc_code]:
-                    # @TODO: hardcode for quantigo
-                    #url = url.replace("http://quantigo.supervise.ly:11111/",
-                    #                  "http://quantigo.supervise.ly:11111/h5un6l2bnaz1vj8a9qgms4-public/")
                     upc_gallery[upc_code].append([url])
                     if "_full" in url:
                         continue
@@ -244,8 +240,6 @@ def init_user_2_upc(api, team_id):
                         continue
                     first_url = False
                     user2upc[user_info.id].append({"upc": upc_code, "image_url": url})
-        #@TODO: only for debug
-        #break
 
 def init_catalog():
     global upc2catalog
@@ -267,6 +261,8 @@ def init_search_catalog():
     global upc2catalog
     global full_catalog
     global upc_gallery
+
+    popover_id = 1
     for upc_int64, info in upc2catalog.items():
         link = None
         if str(upc_int64) in upc_gallery:
@@ -274,13 +270,34 @@ def init_search_catalog():
         else:
             upc_gallery[str(upc_int64)] = []
 
+        new_info = info.copy()
         if link is not None:
-            new_info = info.copy()
-            new_info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
-            full_catalog.append(new_info)
+            # element = """
+            # <el-popover
+            #   ref="popover{}"
+            #   placement="left"
+            #   trigger="hover"
+            #   content="this is content, this is content, this is content">
+            # </el-popover>
+            # """.format(popover_id)
+            #
+            # #button = "<el-button v-popover:popover{} size=\"mini\">ref image</el-button>".format(popover_id)
+            # button = "<el-button size=\"mini\">ref image</el-button>"
+            # new_info["image"] = "<div>{}</div>".format(button)#'<img style="height:50px; width:auto;" src="{}"/>'.format(link)
+            element = """
+            <div class="popover-wrapper">
+                <div class="trigger">hover me</div>
+                <div class="popover-content">
+                  <img src="{}" />
+                </div>
+            </div>
+            """.format(link)
+            new_info["image"] = element
+            popover_id += 1
         # skip upc code
-        #else:
-        #    info["image"] = ""
+        else:
+            info["image"] = ""
+        full_catalog.append(new_info)
 
 
 def main():
