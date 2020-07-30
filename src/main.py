@@ -140,19 +140,9 @@ def prev_object(api: sly.Api, task_id, context, state, app_logger):
 def next_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_next_id, show_msg=True)
 
-
-@my_app.callback("assign_tag")
-@sly.timeit
-def assign_tag(api: sly.Api, task_id, context, state, app_logger):
-    global user2upc
-
+def _assign_tag(api, context, selected_upc):
     project_id = context["projectId"]
     meta = get_project_meta(api, project_id)
-
-    user_id = context["userId"]
-    user2selectedUpc = state["user2selectedUpc"]
-    selected_tag_index = user2selectedUpc[str(user_id)]
-    selected_upc = user2upc[user_id][selected_tag_index]["upc"]
 
     active_figure_id = context["figureId"]
     if active_figure_id is None:
@@ -161,20 +151,20 @@ def assign_tag(api: sly.Api, task_id, context, state, app_logger):
     tag_meta = meta.get_tag_meta(TAG_NAME)
     api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
 
-
-@my_app.callback("multi_assign_tag")
+@my_app.callback("assign_tag")
 @sly.timeit
-def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
+def assign_tag(api: sly.Api, task_id, context, state, app_logger):
     global user2upc
-
-    project_id = context["projectId"]
-    image_id = context["imageId"]
     user_id = context["userId"]
     user2selectedUpc = state["user2selectedUpc"]
-
-    meta = get_project_meta(api, project_id)
     selected_tag_index = user2selectedUpc[str(user_id)]
     selected_upc = user2upc[user_id][selected_tag_index]["upc"]
+    _assign_tag(api, context, selected_upc)
+
+def _multi_assign_tag(api, context, selected_upc):
+    project_id = context["projectId"]
+    image_id = context["imageId"]
+    meta = get_project_meta(api, project_id)
 
     active_figure_id = context["figureId"]
     if active_figure_id is None:
@@ -191,6 +181,16 @@ def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
     for idx, label in enumerate(ann.labels):
         if label.geometry.to_bbox().intersects_with(selected_label.geometry.to_bbox()):
             api.advanced.add_tag_to_object(tag_meta.sly_id, label.geometry.sly_id, value=selected_upc)
+
+@my_app.callback("multi_assign_tag")
+@sly.timeit
+def multi_assign_tag(api: sly.Api, task_id, context, state, app_logger):
+    global user2upc
+    user_id = context["userId"]
+    user2selectedUpc = state["user2selectedUpc"]
+    selected_tag_index = user2selectedUpc[str(user_id)]
+    selected_upc = user2upc[user_id][selected_tag_index]["upc"]
+    _multi_assign_tag(api, context, selected_upc)
 
 def download_remote_files(api, team_id):
     sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
@@ -295,6 +295,10 @@ def main():
     init_search_catalog()
     global full_catalog
 
+    user2selectedRowData = {}
+    for key, _ in user2upc.items():
+        user2selectedRowData[key] = full_catalog[0]
+
     data = {
         "user2upc": user2upc,
         "user2upcIndex2Info": user2upcIndex2Info,
@@ -312,7 +316,7 @@ def main():
         "searching": False,
         "perPage": 10,
         "pageSizes": [5, 10, 20],
-        "selectedRowData": full_catalog[0]
+        "user2selectedRowData": user2selectedRowData
     }
 
     # # start event after successful service run

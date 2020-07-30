@@ -80,7 +80,7 @@
             <el-tab-pane label="Search">
                 <br/><br/><br/>
                 <sly-table :options="{ perPage: state.perPage, pageSizes: state.pageSizes}"
-                           @input="state.selectedRowData = $event.selectedRowData"
+                           @input="state.user2selectedRowData[context.userId] = $event.selectedRowData"
                            :content="data.fullCatalog"></sly-table>
             </el-tab-pane>
             <el-tab-pane label="Search gallery">
@@ -88,7 +88,9 @@
 <!--                <pre>{{ state.selectedRowData }}</pre>-->
 <!--                <pre>{{ state.selectedRowData["UPC CODE"] }}</pre>-->
 <!--                <pre>{{ data.upcGallery[state.selectedRowData['UPC CODE']] }}</pre>-->
-                <sly-gallery height="300px" :auto-reset="true" :content="data.upcGallery[state.selectedRowData['UPC CODE']]"/>
+                <sly-gallery height="300px"
+                             :auto-reset="true"
+                             :content="data.upcGallery[state.user2selectedRowData[context.userId]['UPC CODE']]"/>
             </el-tab-pane>
         </el-tabs>
     </div>
