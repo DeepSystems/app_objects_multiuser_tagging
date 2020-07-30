@@ -260,8 +260,9 @@ def init_search_catalog():
             upc_gallery[str(upc_int64)] = []
 
         if link is not None:
-            info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
-            full_catalog.append(info)
+            new_info = info.copy()
+            new_info["image"] = '<img style="height:100px; width:auto;" src="{}"/>'.format(link)
+            full_catalog.append(new_info)
         # skip upc code
         #else:
         #    info["image"] = ""
