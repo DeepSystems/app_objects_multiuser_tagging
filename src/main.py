@@ -149,6 +149,7 @@ def _assign_tag(api, context, selected_upc):
         sly.logger.warn("Figure is not selected.")
 
     tag_meta = meta.get_tag_meta(TAG_NAME)
+    #api.advanced.remove_tag_from_object(tag_meta.sly_id, active_figure_id)
     api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
 
 @my_app.callback("assign_tag")
@@ -187,6 +188,7 @@ def _multi_assign_tag(api, context, selected_upc):
     tag_meta = meta.get_tag_meta(TAG_NAME)
     for idx, label in enumerate(ann.labels):
         if label.geometry.to_bbox().intersects_with(selected_label.geometry.to_bbox()):
+            #api.advanced.remove_tag_from_object(tag_meta.sly_id, label.geometry.sly_id)
             api.advanced.add_tag_to_object(tag_meta.sly_id, label.geometry.sly_id, value=selected_upc)
 
 @my_app.callback("multi_assign_tag")
