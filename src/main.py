@@ -133,12 +133,39 @@ def select_object(api: sly.Api, task_id, context, find_func, show_msg=False):
 @sly.timeit
 def prev_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_prev_id)
+    _refresh_upc(api, task_id, context, state, app_logger)
+
+def _refresh_upc(api: sly.Api, task_id, context, state, app_logger):
+    user_id = context["userId"]
+    figure_id = context["figureId"]
+    if figure_id is None:
+        app_logger.warning("Can not refresh figure UPC. FigureId is None")
+
+    project_id = context["projectId"]
+    project_meta = get_project_meta(api, project_id, force=False)
+    tags_json = api.advanced.get_object_tags(figure_id)
+    tags = sly.TagCollection.from_json(tags_json, project_meta.tag_metas)
+
+    value = None
+    for tag in tags:
+        if tag.meta.name == TAG_NAME:
+            value = tag.value
+            break
+
+    api.app.set_field(task_id, "data.user2figureUpc", {user_id: value}, append=True)
+    pass
+
+@my_app.callback("refresh_upc")
+@sly.timeit
+def refresh_upc(api: sly.Api, task_id, context, state, app_logger):
+    _refresh_upc(api, task_id, context, state, app_logger)
 
 
 @my_app.callback("next_object")
 @sly.timeit
 def next_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_next_id, show_msg=True)
+    _refresh_upc(api, task_id, context, state, app_logger)
 
 def add_tag_to_object(api, project_meta, figure_id, tag_meta_id, value, remove_duplicates=True):
     tags_json = api.advanced.get_object_tags(figure_id)
@@ -289,31 +316,7 @@ def init_search_catalog():
 
         new_info = info.copy()
         if link is not None:
-            # element = """
-            # <el-popover
-            #   ref="popover{}"
-            #   placement="left"
-            #   trigger="hover"
-            #   content="this is content, this is content, this is content">
-            # </el-popover>
-            # """.format(popover_id)
-            # #button = "<el-button v-popover:popover{} size=\"mini\">ref image</el-button>".format(popover_id)
-            # popover_id += 1
-            # button = "<el-button size=\"mini\">ref image</el-button>"
-
             new_info["image"] = '<img style="height:80px; width:auto;" src="{}"/>'.format(link)
-
-            # element = """
-            # <div class="popover-wrapper">
-            #     <div class="trigger">hover me</div>
-            #     <div class="popover-content">
-            #       <img src="{}" />
-            #     </div>
-            # </div>
-            # """.format(link)
-            # new_info["image"] = element
-
-        # skip upc code
         else:
             new_info["image"] = ""
         full_catalog.append(new_info)
@@ -343,12 +346,15 @@ def main():
             g = upc_gallery[upc_link["upc"]]
             user2upcIndex2upcGallery[user_id][idx] = g
 
+    upc_gallery[None] = []
     init_search_catalog()
     global full_catalog
 
     user2selectedRowData = {}
+    user2figureUpc = {}
     for key, _ in user2upc.items():
         user2selectedRowData[key] = full_catalog[0]
+        user2figureUpc[key] = None
 
     data = {
         "user2upc": user2upc,
@@ -356,7 +362,8 @@ def main():
         "user2upcIndex2upcGallery": user2upcIndex2upcGallery,
         "demoGallery": [["https://i.imgur.com/llPpFm0.jpeg"]],
         "fullCatalog": full_catalog,
-        "upcGallery": upc_gallery
+        "upcGallery": upc_gallery,
+        "user2figureUpc": user2figureUpc
     }
 
     state = {
