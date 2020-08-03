@@ -140,6 +140,17 @@ def prev_object(api: sly.Api, task_id, context, state, app_logger):
 def next_object(api: sly.Api, task_id, context, state, app_logger):
     select_object(api, task_id, context, get_next_id, show_msg=True)
 
+def add_tag_to_object(api, project_meta, figure_id, tag_meta_id, value, remove_duplicates=True):
+    tags_json = api.advanced.get_object_tags(figure_id)
+    tags = sly.TagCollection.from_json(tags_json, project_meta.tag_metas)
+
+    if remove_duplicates is True:
+        for tag in tags:
+            if tag.meta.sly_id == tag_meta_id:
+                api.advanced.remove_tag_from_object(tag_meta_id, figure_id, tag.sly_id)
+
+    api.advanced.add_tag_to_object(tag_meta_id, figure_id, value=value)
+
 def _assign_tag(api, context, selected_upc):
     project_id = context["projectId"]
     meta = get_project_meta(api, project_id)
@@ -149,8 +160,11 @@ def _assign_tag(api, context, selected_upc):
         sly.logger.warn("Figure is not selected.")
 
     tag_meta = meta.get_tag_meta(TAG_NAME)
-    #api.advanced.remove_tag_from_object(tag_meta.sly_id, active_figure_id)
-    api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
+    #api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
+    add_tag_to_object(api, meta, active_figure_id, tag_meta.sly_id, selected_upc)
+
+
+
 
 @my_app.callback("assign_tag")
 @sly.timeit
@@ -189,7 +203,8 @@ def _multi_assign_tag(api, context, selected_upc):
     for idx, label in enumerate(ann.labels):
         if label.geometry.to_bbox().intersects_with(selected_label.geometry.to_bbox()):
             #api.advanced.remove_tag_from_object(tag_meta.sly_id, label.geometry.sly_id)
-            api.advanced.add_tag_to_object(tag_meta.sly_id, label.geometry.sly_id, value=selected_upc)
+            #api.advanced.add_tag_to_object(tag_meta.sly_id, label.geometry.sly_id, value=selected_upc)
+            add_tag_to_object(api, meta, label.geometry.sly_id, tag_meta.sly_id, selected_upc)
 
 @my_app.callback("multi_assign_tag")
 @sly.timeit
