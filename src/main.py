@@ -154,6 +154,8 @@ def _refresh_upc(api: sly.Api, task_id, context, state, app_logger):
     figure_id = context["figureId"]
     if figure_id is None:
         app_logger.warning("Can not refresh figure UPC. FigureId is None")
+        api.app.set_field(task_id, "data.user2figureUpc", {user_id: None}, append=True)
+        return
 
     project_id = context["projectId"]
     project_meta = get_project_meta(api, project_id, force=False)
@@ -209,9 +211,6 @@ def _assign_tag(api, context, selected_upc, tag_name=None):
     #api.advanced.add_tag_to_object(tag_meta.sly_id, active_figure_id, value=selected_upc)
     add_tag_to_object(api, meta, active_figure_id, tag_meta.sly_id, selected_upc)
 
-
-
-
 @my_app.callback("assign_tag")
 @sly.timeit
 def assign_tag(api: sly.Api, task_id, context, state, app_logger):
@@ -237,6 +236,7 @@ def _multi_assign_tag(api, context, selected_upc):
     active_figure_id = context["figureId"]
     if active_figure_id is None:
         sly.logger.warn("Figure is not selected.")
+        return
 
     ann = get_annotation(api, project_id, image_id, active_figure_id)
     selected_label = None
@@ -274,10 +274,12 @@ def multi_assign_tag_catalog(api: sly.Api, task_id, context, state, app_logger):
 @sly.timeit
 def mark_as_error(api: sly.Api, task_id, context, state, app_logger):
     user_id = context["userId"]
-    selected_upc = state["user2selectedRowData"][str(user_id)]['UPC CODE']
-    _multi_assign_tag(api, context, selected_upc)
     _assign_tag(api, context, None, tag_name=ERROR_TAG_NAME)
 
+@my_app.callback("manual_selected_figure_changed")
+@sly.timeit
+def manual_selected_figure_changed(api: sly.Api, task_id, context, state, app_logger):
+    _refresh_upc(api, task_id, context, state, app_logger)
 
 def download_remote_files(api, team_id):
     sly.fs.ensure_base_path(LOCAL_DIRECTORY_PATH)
