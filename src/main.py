@@ -280,7 +280,7 @@ def init_user_2_upc(api, team_id):
             team_info = api.team.get_info_by_id(team_id)
             raise RuntimeError("User {!r} no found in team {!r}".format(user, team_info.name))
         for batch_id in upc_batches:
-            for upc_code in upc_batch[str(batch_id)]:
+            for upc_code in upc_batch[str(batch_id)]["upcs"]:
                 first_url = True
                 for url in upc_url[upc_code]:
                     upc_gallery[upc_code].append([url])

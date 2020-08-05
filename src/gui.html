@@ -10,7 +10,6 @@
             }
         </sly-style>
 
-
         <el-tabs type="card">
             <el-tab-pane label="Catalog">
                 <div v-if="context.userId in data.user2upc">
@@ -65,16 +64,6 @@
                     <div>User with id = {{context.userId}} is not allowed for UPC batches</div>
                 </div>
 
-
-                <el-dialog
-                  :visible.sync="state.dialogVisible"
-                  size="tiny"
-                  title="Image Done">
-                  <span>All objects are viewed. Move to next image</span>
-                  <span class="dialog-footer" slot="footer">
-                    <el-button @click="state.dialogVisible = false" type="primary">Confirm</el-button>
-                  </span>
-                </el-dialog>
             </el-tab-pane>
             <el-tab-pane label="UPC Info">
                 <br/>
@@ -178,6 +167,17 @@
 <!--            </el-tab-pane>-->
         </el-tabs>
     </div>
+
+    <el-dialog
+      :visible.sync="state.dialogVisible"
+      size="tiny"
+      title="Image Done">
+      <span>All objects are viewed. Move to next image</span>
+      <span class="dialog-footer" slot="footer">
+        <el-button @click="state.dialogVisible = false" type="primary">Confirm</el-button>
+      </span>
+    </el-dialog>
+
 <!--    <div v-if="!(context.userId in data.user2upc)">-->
 <!--        <div>User with id = {{context.userId}} is not allowed for this app</div>-->
 <!--    </div>-->
