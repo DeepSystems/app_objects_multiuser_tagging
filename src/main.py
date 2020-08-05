@@ -153,7 +153,7 @@ def _refresh_upc(api: sly.Api, task_id, context, state, app_logger):
     user_id = context["userId"]
     figure_id = context["figureId"]
     if figure_id is None:
-        app_logger.warning("Can not refresh figure UPC. FigureId is None")
+        #app_logger.warning("Can not refresh figure UPC. FigureId is None")
         api.app.set_field(task_id, "data.user2figureUpc", {user_id: None}, append=True)
         return
 
