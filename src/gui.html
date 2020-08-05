@@ -95,10 +95,8 @@
                            :content="data.fullCatalog"></sly-table>
             </el-tab-pane>
             <el-tab-pane label="Search gallery">
-<!--                <pre>{{ state.selectedRowData }}</pre>-->
-<!--                <pre>{{ state.selectedRowData["UPC CODE"] }}</pre>-->
-<!--                <pre>{{ data.upcGallery[state.selectedRowData['UPC CODE']] }}</pre>-->
-                <div style="z-index:999; position: fixed; background: white; width: 100%; padding: 8px 0;">
+                <div style="background: white; width: 100%; margin-top: 42px; padding: 8px 0;">
+<!--                <div style="z-index:999; position: fixed; background: white; width: 100%; padding: 8px 0;">-->
                     <el-button @click="command('prev_object')"
                                icon="arrow-left"
                                size="small"
@@ -124,19 +122,12 @@
                         Multi assign
                     </el-button>
                 </div>
-                <sly-gallery height="300px"
-                             style="margin-top: 50px; padding-top: 50px;"
-                             :auto-reset="true"
+                <sly-gallery height="300px" :auto-reset="true"
                              :content="data.upcGallery[state.user2selectedRowData[context.userId]['UPC CODE']]"/>
             </el-tab-pane>
-<!--            <el-tab-pane label="Debug">-->
-<!--                <br/><br/><br/>-->
-<!--                <pre>{{ state.user2selectedRowData[context.userId] }}</pre>-->
-<!--                <pre>{{ state.user2selectedRowData[context.userId]["UPC CODE"] }}</pre>-->
-<!--                <pre>{{ data.upcGallery[state.user2selectedRowData[context.userId]['UPC CODE']] }}</pre>-->
-<!--            </el-tab-pane>-->
             <el-tab-pane label="Review">
-                <div style="z-index:999; position: fixed; background: white; width: 100%; padding: 8px 0;">
+                <div style="background: white; width: 100%; margin-top: 42px; padding: 8px 0;">
+<!--                <div style="z-index:999; position: fixed; background: white; width: 100%; padding: 8px 0;">-->
                     <el-button @click="command('prev_object')"
                                icon="arrow-left"
                                size="small"
@@ -154,10 +145,9 @@
                         <i class="zmdi zmdi-refresh"/> Refresh UPC
                     </el-button>
                 </div>
-                <sly-gallery height="300px"
-                             style="margin-top: 50px; padding-top: 50px;"
-                             :auto-reset="true"
-                             :content="data.upcGallery[data.user2figureUpc[context.userId]]"/>
+                <sly-gallery height="300px" :auto-reset="true"
+                             :content="data.upcGallery[data.user2figureUpc[context.userId]]">
+                </sly-gallery>
             </el-tab-pane>
 <!--            <el-tab-pane label="Debug">-->
 <!--                <br/><br/><br/>-->
