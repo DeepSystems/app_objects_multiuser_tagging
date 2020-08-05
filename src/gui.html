@@ -144,6 +144,11 @@
                                style="margin-left: 10px;">
                         <i class="zmdi zmdi-refresh"/> Refresh UPC
                     </el-button>
+                    <el-button @click="command('mark_as_error')"
+                               size="small"
+                               style="margin-left: 10px; color: red;">
+                        <i class="zmdi zmdi-alert-circle"/> Error
+                    </el-button>
                 </div>
                 <sly-gallery height="300px" :auto-reset="true"
                              :content="data.upcGallery[data.user2figureUpc[context.userId]]">
